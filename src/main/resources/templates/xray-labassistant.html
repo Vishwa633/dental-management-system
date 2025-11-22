@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-ray Lab Assistant | Professional Imaging System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c5aa0;
+            --primary-dark: #1e3d72;
+            --secondary: #00b894;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: none;
+            width: 100%;
+        }
+
+        /* Add background colors to each card */
+        .stat-card.pending {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffeaa7;
+        }
+
+        .stat-card.processed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: 2px solid #c3e6cb;
+        }
+
+        .stat-card.emergency {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border: 2px solid #f5c6cb;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .stat-card.pending .stat-icon {
+            color: #856404;
+        }
+
+        .stat-card.processed .stat-icon {
+            color: #155724;
+        }
+
+        .stat-card.emergency .stat-icon {
+            color: #721c24;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #856404;
+        }
+
+        .stat-card.processed .stat-number {
+            color: #155724;
+        }
+
+        .stat-card.emergency .stat-number {
+            color: #721c24;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card.pending .stat-label {
+            color: #856404;
+        }
+
+        .stat-card.processed .stat-label {
+            color: #155724;
+        }
+
+        .stat-card.emergency .stat-label {
+            color: #721c24;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .requests-table th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .requests-table td {
+            padding: 16px 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+            transition: background-color 0.2s ease;
+        }
+
+        .requests-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-emergency {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary), #00a085);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+            color: white;
+        }
+
+        .btn-emergency {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+            padding: 12px 24px;
+            font-size: 14px;
+        }
+
+        .no-requests {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            color: var(--dark);
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: #f0f8ff;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        select.form-input {
+            cursor: pointer;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease;
+            min-width: 300px;
+        }
+
+        .toast.success { border-left-color: var(--secondary); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.info { border-left-color: var(--info); }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast.success .toast-icon { color: var(--secondary); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast.info .toast-icon { color: var(--info); }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Custom Confirmation Dialog Styles */
+        .confirm-dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .confirm-dialog {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .confirm-dialog-header {
+            padding: 30px 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .confirm-dialog-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            border: 4px solid;
+        }
+
+        .confirm-dialog-icon.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .confirm-dialog-icon.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .confirm-dialog-icon.success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .confirm-dialog-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+
+        .confirm-dialog-message {
+            color: var(--gray);
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .confirm-dialog-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid var(--border);
+        }
+
+        .confirm-btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 130px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .confirm-btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .confirm-btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+        }
+
+        .confirm-btn-secondary {
+            background: white;
+            color: var(--gray);
+            border: 2px solid var(--border);
+        }
+
+        .confirm-btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: var(--gray);
+        }
+
+        /* Specific dialog types */
+        .confirm-dialog.warning .confirm-dialog-icon {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .confirm-dialog.danger .confirm-dialog-icon {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .confirm-dialog.success .confirm-dialog-icon {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .requests-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+
+            .confirm-dialog {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+
+            .confirm-dialog-actions {
+                flex-direction: column;
+            }
+
+            .confirm-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="dashboard-container">
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-x-ray"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>X-ray Lab Assistant</h1>
+                    <p>Professional Medical Imaging System</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <!-- Add CSRF token meta tags at the top of your page -->
+                <meta name="_csrf" th:content="${_csrf.token}"/>
+                <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+                <!-- Replace the button with a form -->
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card pending">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number" id="pendingCount">0</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            <div class="stat-card processed">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number" id="processedCount">0</div>
+                <div class="stat-label">Processed Today</div>
+            </div>
+            <div class="stat-card emergency">
+                <div class="stat-icon">
+                    <i class="fas fa-ambulance"></i>
+                </div>
+                <div class="stat-number" id="emergencyCount">0</div>
+                <div class="stat-label">Emergency Cases</div>
+            </div>
+        </div>
+
+        <!-- Dentist X-ray Requests Section -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-teeth"></i>
+                Dentist X-ray Requests
+            </h2>
+        </div>
+
+        <table class="requests-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Dentist</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="requestsTableBody">
+            <tr>
+                <td colspan="7" class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading requests...
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Processed X-ray Requests Section -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-check-double"></i>
+                Processed X-ray Requests
+            </h2>
+        </div>
+
+        <table class="requests-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Dentist</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Notes</th>
+            </tr>
+            </thead>
+            <tbody id="processedTableBody">
+            <tr>
+                <td colspan="6" class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading processed requests...
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Emergency X-ray Requests Section -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-ambulance"></i>
+                Emergency X-ray Requests
+            </h2>
+            <button class="btn btn-emergency" onclick="openEmergencyModal()">
+                <i class="fas fa-plus"></i>
+                Create Emergency Request
+            </button>
+        </div>
+
+        <table class="requests-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Notes</th>
+            </tr>
+            </thead>
+            <tbody id="emergencyTableBody">
+            <tr>
+                <td colspan="6" class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading emergency requests...
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Upload Modal for Dentist Requests -->
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-upload"></i>
+                Upload X-ray Image
+            </h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Patient Information</label>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <p><strong>Patient:</strong> <span id="modalPatientName">-</span></p>
+                <p><strong>Request ID:</strong> <span id="modalRequestId">-</span></p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">X-ray Image</label>
+            <div class="file-upload-area" id="fileUploadArea" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary); margin-bottom: 15px;"></i>
+                <p style="font-weight: 600; margin-bottom: 8px;">Drag & Drop your X-ray image here</p>
+                <p style="color: var(--gray); font-size: 14px; margin-bottom: 15px;">or click to browse</p>
+                <input type="file" id="fileInput" class="file-input" accept=".jpg,.jpeg,.png,.dcm" onchange="handleFileSelect(this.files)">
+                <p style="color: var(--gray); font-size: 12px; margin-top: 10px;">
+                    Supported formats: JPG, PNG, DICOM | Max size: 10MB
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Additional Notes</label>
+            <textarea id="notesInput" class="form-input" rows="4" placeholder="Add any clinical notes or observations about the X-ray..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <button class="btn btn-success" onclick="uploadImage()">
+                <i class="fas fa-check"></i>
+                Upload & Process
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Emergency Request Modal -->
+<div id="emergencyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-ambulance"></i>
+                Create Emergency X-ray Request
+            </h3>
+            <button class="close-btn" onclick="closeEmergencyModal()">&times;</button>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Patient Name *</label>
+            <input type="text" id="emergencyPatientName" class="form-input" placeholder="Enter patient full name" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">X-ray Type *</label>
+            <select id="emergencyType" class="form-input" required>
+                <option value="">Select X-ray type</option>
+                <option value="Panoramic">Panoramic</option>
+                <option value="Bitewing">Bitewing</option>
+                <option value="Periapical">Periapical</option>
+                <option value="Occlusal">Occlusal</option>
+                <option value="Cephalometric">Cephalometric</option>
+                <option value="CBCT">CBCT (Cone Beam CT)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">X-ray Image (Optional)</label>
+            <input type="file" id="emergencyFileInput" class="file-input" accept=".jpg,.jpeg,.png,.dcm">
+            <p style="color: var(--gray); font-size: 12px; margin-top: 5px;">
+                Max size: 10MB | Formats: JPG, PNG, DICOM
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Clinical Notes</label>
+            <textarea id="emergencyNotesInput" class="form-input" rows="4" placeholder="Describe the emergency situation, symptoms, or special instructions..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeEmergencyModal()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <button class="btn btn-emergency" onclick="createEmergencyRequest()">
+                <i class="fas fa-bolt"></i>
+                Create Emergency Request
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirmation Dialog for Delete Actions -->
+<div id="confirmDialog" class="confirm-dialog-overlay">
+    <div class="confirm-dialog danger">
+        <div class="confirm-dialog-header">
+            <div class="confirm-dialog-icon danger">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="confirm-dialog-title" id="confirmDialogTitle">Confirm Deletion</h3>
+            <p class="confirm-dialog-message" id="confirmDialogMessage">Are you sure you want to delete this item? This action cannot be undone.</p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button class="confirm-btn confirm-btn-secondary" onclick="ConfirmDialog.cancel()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <button class="confirm-btn confirm-btn-danger" onclick="ConfirmDialog.confirm()">
+                <i class="fas fa-trash"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Confirmation Dialog -->
+<div id="successDialog" class="confirm-dialog-overlay">
+    <div class="confirm-dialog success">
+        <div class="confirm-dialog-header">
+            <div class="confirm-dialog-icon success">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="confirm-dialog-title" id="successDialogTitle">Success!</h3>
+            <p class="confirm-dialog-message" id="successDialogMessage">Operation completed successfully.</p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button class="confirm-btn confirm-btn-primary" onclick="SuccessDialog.close()">
+                <i class="fas fa-check"></i>
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Warning Confirmation Dialog -->
+<div id="warningDialog" class="confirm-dialog-overlay">
+    <div class="confirm-dialog warning">
+        <div class="confirm-dialog-header">
+            <div class="confirm-dialog-icon warning">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 class="confirm-dialog-title" id="warningDialogTitle">Warning</h3>
+            <p class="confirm-dialog-message" id="warningDialogMessage">Please confirm this action.</p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button class="confirm-btn confirm-btn-secondary" onclick="WarningDialog.cancel()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <button class="confirm-btn confirm-btn-primary" onclick="WarningDialog.confirm()">
+                <i class="fas fa-check"></i>
+                Continue
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const CONFIG = {
+        API_BASE: 'http://localhost:8080/api/xray-requests',
+        EMERGENCY_API_BASE: 'http://localhost:8080/api/xray-requests',
+        // ... rest of your config
+
+        MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+        ALLOWED_FILE_TYPES: ['jpg', 'jpeg', 'png', 'dcm'],
+        AUTO_REFRESH_INTERVAL: 400000000// 30 seconds
+    };
+
+    // State management
+    let currentRequestId = null;
+    let refreshInterval = null;
+
+    // Toast notification system
+    class Toast {
+        static show(message, type = 'info', title = null) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+
+            toast.innerHTML = `
+            <div class="toast-icon">
+                <i class="${icons[type]}"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-title">${title || type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+            container.appendChild(toast);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+    }
+
+    // Professional Dialog Management System
+    class DialogManager {
+        static showDialog(dialogId, title, message) {
+            const dialog = document.getElementById(dialogId);
+            const titleElement = dialog.querySelector('.confirm-dialog-title');
+            const messageElement = dialog.querySelector('.confirm-dialog-message');
+
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            dialog.style.display = 'flex';
+
+            // Add escape key listener
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    this.hideDialog(dialogId);
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+        }
+
+        static hideDialog(dialogId) {
+            const dialog = document.getElementById(dialogId);
+            dialog.style.display = 'none';
+        }
+
+        static createPromiseDialog(dialogId, title, message) {
+            return new Promise((resolve) => {
+                const dialog = document.getElementById(dialogId);
+                const titleElement = dialog.querySelector('.confirm-dialog-title');
+                const messageElement = dialog.querySelector('.confirm-dialog-message');
+
+                titleElement.textContent = title;
+                messageElement.textContent = message;
+                dialog.style.display = 'flex';
+
+                // Store resolve function
+                dialog._resolve = resolve;
+
+                // Add escape key listener
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideDialog(dialogId);
+                        resolve(false);
+                        document.removeEventListener('keydown', escapeHandler);
+                    }
+                };
+                document.addEventListener('keydown', escapeHandler);
+            });
+        }
+    }
+
+    // Specific dialog controllers
+    class ConfirmDialog {
+        static callback = null;
+
+        static async show(title, message) {
+            return new Promise((resolve) => {
+                this.callback = resolve;
+                DialogManager.showDialog('confirmDialog', title, message);
+            });
+        }
+
+        static confirm() {
+            if (this.callback) {
+                this.callback(true);
+                this.callback = null;
+            }
+            DialogManager.hideDialog('confirmDialog');
+        }
+
+        static cancel() {
+            if (this.callback) {
+                this.callback(false);
+                this.callback = null;
+            }
+            DialogManager.hideDialog('confirmDialog');
+        }
+    }
+
+    class SuccessDialog {
+        static callback = null;
+
+        static show(title, message, callback = null) {
+            this.callback = callback;
+            DialogManager.showDialog('successDialog', title, message);
+        }
+
+        static close() {
+            if (this.callback) {
+                this.callback();
+                this.callback = null;
+            }
+            DialogManager.hideDialog('successDialog');
+        }
+    }
+
+    class WarningDialog {
+        static callback = null;
+
+        static async show(title, message) {
+            return new Promise((resolve) => {
+                this.callback = resolve;
+                DialogManager.showDialog('warningDialog', title, message);
+            });
+        }
+
+        static confirm() {
+            if (this.callback) {
+                this.callback(true);
+                this.callback = null;
+            }
+            DialogManager.hideDialog('warningDialog');
+        }
+
+        static cancel() {
+            if (this.callback) {
+                this.callback(false);
+                this.callback = null;
+            }
+            DialogManager.hideDialog('warningDialog');
+        }
+    }
+
+    // Error handling utilities
+    class ErrorHandler {
+        static handleNetworkError(error) {
+            console.error('Network Error:', error);
+            Toast.show(
+                'Unable to connect to the server. Please check your internet connection and ensure the backend service is running.',
+                'error',
+                'Connection Error'
+            );
+        }
+
+        static handleApiError(error, context) {
+            console.error(`API Error in ${context}:`, error);
+
+            if (error.message.includes('Failed to fetch') || error.message.includes('timeout')) {
+                this.handleNetworkError(error);
+            } else {
+                Toast.show(
+                    `Operation failed: ${error.message}`,
+                    'error',
+                    `${context} Error`
+                );
+            }
+        }
+
+        // ADD THIS MISSING METHOD:
+        static validateFile(file) {
+            if (!file) {
+                throw new Error('Please select a file to upload');
+            }
+
+            // Check file size
+            if (file.size > CONFIG.MAX_FILE_SIZE) {
+                throw new Error(`File size must be less than ${CONFIG.MAX_FILE_SIZE / (1024 * 1024)}MB`);
+            }
+
+            // Check file type
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!CONFIG.ALLOWED_FILE_TYPES.includes(fileExtension)) {
+                throw new Error(`File type not supported. Allowed types: ${CONFIG.ALLOWED_FILE_TYPES.join(', ')}`);
+            }
+
+            return true;
+        }
+
+        static validateForm(formData, requiredFields) {
+            for (const field of requiredFields) {
+                if (!formData.get(field)?.toString().trim()) {
+                    throw new Error(`Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+                }
+            }
+        }
+    }
+
+    // API service layer
+    class ApiService {
+        static async getPendingRequests() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE}/pending`);
+                if (response.ok) {
+                    return await response.json();
+                }
+                return [];
+            } catch (error) {
+                console.log('No pending requests found');
+                return [];
+            }
+        }
+
+        static async getProcessedRequests() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE}/processed`);
+                if (response.ok) {
+                    return await response.json();
+                }
+                return [];
+            } catch (error) {
+                console.log('No processed requests found');
+                return [];
+            }
+        }
+
+        static async getEmergencyRequests() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE}/emergency`);
+                if (response.ok) {
+                    return await response.json();
+                }
+                throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+            } catch (error) {
+                console.error('Error fetching emergency requests:', error);
+                throw error;
+            }
+        }
+
+        // UPDATED UPLOAD METHOD:
+        static async uploadXRay(requestId, formData) {
+            const response = await fetch(`${CONFIG.API_BASE}/${requestId}`, {
+                method: 'PUT',
+                headers: {
+                    // Don't set Content-Type for FormData - let browser set it with boundary
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Upload failed');
+            }
+
+            // Handle both JSON and plain text responses
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            } else {
+                return await response.text();
+            }
+        }
+
+        static async createEmergencyRequest(payload) {
+            const response = await fetch(`${CONFIG.API_BASE}/emergency`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP ${response.status}: Emergency request creation failed`);
+            }
+            return await response.json();
+        }
+
+        static async deleteRequest(requestId) {
+            const response = await fetch(`${CONFIG.API_BASE}/${requestId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                throw new Error('Delete failed');
+            }
+            return await response.text();
+        }
+
+        static async deleteEmergencyRequest(requestId) {
+            const response = await fetch(`${CONFIG.API_BASE}/emergency/${requestId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP ${response.status}: Emergency delete failed`);
+            }
+            return await response.text();
+        }
+    }
+
+    // UI rendering functions
+    class UIRenderer {
+        static formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // UPDATED: Emergency requests always show as PROCESSED
+        static renderEmergencyTable(requests) {
+            const tbody = document.getElementById('emergencyTableBody');
+
+            if (!requests || requests.length === 0) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="no-requests"> <!-- Changed from 7 to 6 columns -->
+                    <i class="fas fa-ambulance" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                    <br>
+                    No emergency requests found
+                </td>
+            </tr>
+        `;
+                return;
+            }
+
+            tbody.innerHTML = requests.map(request => {
+                // FIX: Always show emergency requests as PROCESSED regardless of image
+                const statusClass = 'status-processed'; // Always processed for emergency
+                const statusText = 'PROCESSED'; // Always processed for emergency
+                const statusIcon = 'fas fa-check-circle'; // Always check icon for emergency
+
+                return `
+            <tr>
+                <td><strong>#${request.id}</strong></td>
+                <td>${this.escapeHtml(request.patientName)}</td>
+                <td>${this.formatDate(request.requestDate)}</td>
+                <td>${this.escapeHtml(request.xrayType)}</td>
+                <td>
+                    <span class="status-badge ${statusClass}">
+                        <i class="${statusIcon}"></i>
+                        ${statusText}
+                    </span>
+                </td>
+                <td>${this.escapeHtml(request.notes || 'No notes provided')}</td>
+                <!-- REMOVED ACTIONS COLUMN COMPLETELY -->
+            </tr>
+        `;
+            }).join('');
+        }
+
+        static updateStatistics(pendingRequests, processedRequests, emergencyRequests) {
+            document.getElementById('pendingCount').textContent = pendingRequests?.length || 0;
+            document.getElementById('processedCount').textContent = processedRequests?.length || 0;
+            document.getElementById('emergencyCount').textContent = emergencyRequests?.length || 0;
+        }
+
+        static escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        static showLoading(containerId, message = 'Loading...') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+            <tr>
+                <td colspan="7" class="loading">
+                    <div class="loading-spinner"></div>
+                    ${message}
+                </td>
+            </tr>
+        `;
+        }
+
+        // Make sure your renderRequestsTable is ONLY for regular requests
+        static renderRequestsTable(requests, containerId, isProcessed = false) {
+            const tbody = document.getElementById(containerId);
+
+            if (!requests || requests.length === 0) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="${isProcessed ? 6 : 7}" class="no-requests">
+                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                    <br>
+                    No ${isProcessed ? 'processed' : 'pending'} requests found
+                </td>
+            </tr>
+        `;
+                return;
+            }
+
+            tbody.innerHTML = requests.map(request => {
+                const statusClass = request.status === 'PENDING' ? 'status-pending' : 'status-processed';
+                const statusIcon = request.status === 'PENDING' ? 'fas fa-clock' : 'fas fa-check-circle';
+
+                const baseRow = `
+            <tr>
+                <td><strong>#${request.id}</strong></td>
+                <td>${this.escapeHtml(request.patientName)}</td>
+                <td>${this.escapeHtml(request.dentistName || '-')}</td>
+                <td>${this.formatDate(request.requestDate)}</td>
+                <td>
+                    <span class="status-badge ${statusClass}">
+                        <i class="${statusIcon}"></i>
+                        ${request.status}
+                    </span>
+                </td>
+                <td>
+                    <div style="max-width: 300px; word-wrap: break-word;">
+                        <div><strong>Dentist Notes:</strong> ${this.escapeHtml(request.description || 'No description provided')}</div>
+                        ${request.notes ? `<div style="margin-top: 5px;"><strong>Lab Notes:</strong> ${this.escapeHtml(request.notes)}</div>` : ''}
+                    </div>
+                </td>
+        `;
+
+                // REGULAR REQUESTS STILL HAVE ACTIONS
+                if (isProcessed) {
+                    return baseRow + `</tr>`;
+                } else {
+                    return baseRow + `
+                <td>
+                    <button class="btn btn-success" onclick="openModal(${request.id}, '${this.escapeHtml(request.patientName).replace(/'/g, "\\'")}')">
+                        <i class="fas fa-upload"></i>
+                        Upload
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteRequest(${request.id})">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </button>
+                </td>
+            </tr>`;
+                }
+            }).join('');
+        }
+    }
+
+    // Main application functions
+    async function loadAllData() {
+        try {
+            UIRenderer.showLoading('requestsTableBody', 'Loading pending requests...');
+            UIRenderer.showLoading('processedTableBody', 'Loading processed requests...');
+            UIRenderer.showLoading('emergencyTableBody', 'Loading emergency requests...');
+
+            const [pendingRequests, processedRequests, emergencyRequests] = await Promise.all([
+                ApiService.getPendingRequests(),
+                ApiService.getProcessedRequests(),
+                ApiService.getEmergencyRequests()
+            ]);
+
+            UIRenderer.renderRequestsTable(pendingRequests, 'requestsTableBody');
+            UIRenderer.renderRequestsTable(processedRequests, 'processedTableBody', true);
+            UIRenderer.renderEmergencyTable(emergencyRequests);
+            UIRenderer.updateStatistics(pendingRequests, processedRequests, emergencyRequests);
+
+        } catch (error) {
+            ErrorHandler.handleApiError(error, 'loading data');
+            UIRenderer.showLoading('requestsTableBody', 'Error loading data');
+            UIRenderer.showLoading('processedTableBody', 'Error loading data');
+            UIRenderer.showLoading('emergencyTableBody', 'Error loading data');
+        }
+    }
+
+    // Modal management
+    function openModal(requestId, patientName) {
+        currentRequestId = requestId;
+        document.getElementById('modalPatientName').textContent = patientName;
+        document.getElementById('modalRequestId').textContent = requestId;
+        document.getElementById('uploadModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('notesInput').value = '';
+        document.getElementById('fileUploadArea').classList.remove('dragover');
+    }
+
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').style.display = 'flex';
+    }
+
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').style.display = 'none';
+        document.getElementById('emergencyPatientName').value = '';
+        document.getElementById('emergencyType').value = '';
+        document.getElementById('emergencyFileInput').value = '';
+        document.getElementById('emergencyNotesInput').value = '';
+    }
+
+    // File handling
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('fileUploadArea').classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('fileUploadArea').classList.remove('dragover');
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('fileUploadArea').classList.remove('dragover');
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files);
+        }
+    }
+
+    function handleFileSelect(files) {
+        const fileInput = document.getElementById('fileInput');
+        fileInput.files = files;
+    }
+
+    // Enhanced upload success with beautiful dialog
+    async function uploadImage() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const notes = document.getElementById('notesInput').value;
+
+        try {
+            // Validate file
+            ErrorHandler.validateFile(file);
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('notes', notes);
+            formData.append('status', 'PROCESSED'); // Update status when uploading
+
+            const uploadBtn = document.querySelector('#uploadModal .btn-success');
+            const originalText = uploadBtn.innerHTML;
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadBtn.disabled = true;
+
+            // Upload the file
+            await ApiService.uploadXRay(currentRequestId, formData);
+
+            // Show success dialog
+            SuccessDialog.show(
+                'Upload Successful',
+                'X-ray image has been uploaded and processed successfully. The request has been moved to processed requests.',
+                () => {
+                    closeModal();
+                    loadAllData();
+                }
+            );
+
+        } catch (error) {
+            ErrorHandler.handleApiError(error, 'uploading X-ray');
+
+            // Reset button state on error
+            const uploadBtn = document.querySelector('#uploadModal .btn-success');
+            uploadBtn.innerHTML = '<i class="fas fa-check"></i> Upload & Process';
+            uploadBtn.disabled = false;
+        }
+    }
+
+    // Enhanced emergency request creation
+    async function createEmergencyRequest() {
+        const patientName = document.getElementById('emergencyPatientName').value;
+        const type = document.getElementById('emergencyType').value;
+        const notes = document.getElementById('emergencyNotesInput').value;
+        const fileInput = document.getElementById('emergencyFileInput');
+        const file = fileInput.files[0];
+
+        try {
+            if (!patientName || !type) {
+                throw new Error('Patient name and X-ray type are required');
+            }
+
+            const formData = new FormData();
+            formData.append('patientName', patientName);
+            formData.append('xrayType', type);
+            formData.append('notes', notes);
+            formData.append('createdBy', 'Lab Assistant');
+            formData.append('status', 'PROCESSED'); // ADDED: Set status as PROCESSED for emergency requests
+
+            if (file) {
+                formData.append('image', file);
+            }
+
+            const createBtn = document.querySelector('#emergencyModal .btn-emergency');
+            const originalText = createBtn.innerHTML;
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            createBtn.disabled = true;
+
+            const response = await fetch(`${CONFIG.API_BASE}/emergency`, {
+                method: 'POST',
+                body: formData
+                // Don't set Content-Type header for FormData - browser will set it with boundary
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP ${response.status}: Emergency request creation failed`);
+            }
+
+            const result = await response.json();
+
+            SuccessDialog.show(
+                'Emergency Request Created',
+                'Emergency X-ray request has been created successfully!' + (file ? ' Image uploaded and path stored.' : ''),
+                () => {
+                    closeEmergencyModal();
+                    loadAllData();
+                }
+            );
+
+        } catch (error) {
+            ErrorHandler.handleApiError(error, 'creating emergency request');
+            const createBtn = document.querySelector('#emergencyModal .btn-emergency');
+            createBtn.innerHTML = '<i class="fas fa-bolt"></i> Create Emergency Request';
+            createBtn.disabled = false;
+        }
+    }
+
+    // Enhanced delete functions with beautiful dialogs
+    async function deleteRequest(id) {
+        const confirmed = await ConfirmDialog.show(
+            'Delete Request',
+            'Are you sure you want to delete this X-ray request? This action cannot be undone and all associated data will be permanently removed.'
+        );
+
+        if (confirmed) {
+            try {
+                await ApiService.deleteRequest(id);
+                Toast.show('X-ray request deleted successfully!', 'success', 'Request Deleted');
+                await loadAllData();
+            } catch (error) {
+                ErrorHandler.handleApiError(error, 'deleting request');
+            }
+        }
+    }
+
+    async function deleteEmergencyRequest(id) {
+        const confirmed = await ConfirmDialog.show(
+            'Delete Emergency Request',
+            'Are you sure you want to delete this emergency X-ray request? This is a critical medical record and deletion cannot be undone.'
+        );
+
+        if (confirmed) {
+            try {
+                console.log(`Attempting to delete emergency request ID: ${id}`);
+                await ApiService.deleteEmergencyRequest(id);
+                Toast.show('Emergency request deleted successfully!', 'success', 'Emergency Request Deleted');
+                await loadAllData();
+            } catch (error) {
+                console.error('Delete error details:', error);
+                ErrorHandler.handleApiError(error, 'deleting emergency request');
+            }
+        }
+    }
+
+    function startAutoRefresh() {
+        refreshInterval = setInterval(loadAllData, CONFIG.AUTO_REFRESH_INTERVAL);
+    }
+
+    function stopAutoRefresh() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+    }
+
+    // Event listeners and initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close dialogs when clicking outside
+        document.querySelectorAll('.confirm-dialog-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                    // Also cancel any pending callbacks
+                    if (this.id === 'confirmDialog' && ConfirmDialog.callback) {
+                        ConfirmDialog.callback(false);
+                        ConfirmDialog.callback = null;
+                    }
+                    if (this.id === 'warningDialog' && WarningDialog.callback) {
+                        WarningDialog.callback(false);
+                        WarningDialog.callback = null;
+                    }
+                }
+            });
+        });
+
+        // Load initial data
+        loadAllData();
+
+        // Start auto-refresh
+        startAutoRefresh();
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const uploadModal = document.getElementById('uploadModal');
+            const emergencyModal = document.getElementById('emergencyModal');
+
+            if (event.target === uploadModal) closeModal();
+            if (event.target === emergencyModal) closeEmergencyModal();
+        };
+
+        // Handle escape key to close modals
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+                closeEmergencyModal();
+            }
+        });
+
+        // Prevent drag and drop default behavior
+        document.addEventListener('dragover', function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('drop', function(event) {
+            event.preventDefault();
+        });
+    });
+
+    // Stop auto-refresh when page becomes inactive
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopAutoRefresh();
+        } else {
+            startAutoRefresh();
+        }
+    });
+</script>
+</body>
+</html>

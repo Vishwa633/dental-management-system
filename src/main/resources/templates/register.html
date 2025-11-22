@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - SmileCare Dental</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Pacifico', 'cursive'],
+          },
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#1e40af',
+            light: '#f0f9ff'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .error-message {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .input-error {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+    .input-success {
+      border-color: #16a34a;
+    }
+  </style>
+</head>
+<body class="bg-light">
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+    <div th:if="${error}" class="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-center"
+         th:text="${error}">
+    </div>
+    <!-- Image Panel -->
+    <div class="w-full md:w-1/2 relative">
+      <img th:src="@{/image/smile.jpg}"
+           alt="A modern and clean dental examination room"
+           class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-primary bg-opacity-40"></div>
+      <div class="absolute inset-0 flex flex-col justify-center items-center text-center p-8 text-white">
+        <h1 class="font-display text-5xl mb-4">Welcome</h1>
+        <p class="text-lg max-w-sm">Join our family and let us take care of your smile. Creating an account is the first step towards a healthier, brighter you.</p>
+      </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Create Your Account</h2>
+        <p class="text-gray-600 mb-8">Let's get you started!</p>
+
+        <!-- Registration Form for Spring Boot -->
+        <form th:action="@{/register}" th:object="${user}" method="post" class="space-y-5" id="registrationForm" novalidate>
+
+          <!-- Full Name -->
+          <div>
+            <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input type="text" id="fullName" th:field="*{fullName}" placeholder="e.g., Nimal Priyantha"
+                   class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                   required minlength="2" maxlength="100">
+            <div class="error-message" id="fullNameError">Full name must be at least 2 characters long</div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Date of Birth -->
+            <div>
+              <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+              <input type="date" id="dob" th:field="*{dob}"
+                     class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                     required max="2023-12-31">
+              <div class="error-message" id="dobError">Please enter a valid date of birth</div>
+            </div>
+            <!-- Gender -->
+            <div>
+              <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+              <select id="gender" th:field="*{gender}"
+                      class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary" required>
+                <option value="" disabled selected>Select...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <div class="error-message" id="genderError">Please select your gender</div>
+            </div>
+          </div>
+
+          <!-- Contact Number -->
+          <div>
+            <label for="contactNumber" class="block text-sm font-medium text-gray-700">Contact Number</label>
+            <input type="tel" id="contactNumber" th:field="*{contactNumber}" placeholder="e.g., 0775821487"
+                   class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                   required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+            <div class="error-message" id="contactNumberError">Please enter a valid 10-digit phone number</div>
+          </div>
+
+          <!-- Email Address -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="you@example.com"
+                   class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                   required>
+            <div class="error-message" id="emailError">Please enter a valid email address</div>
+          </div>
+
+          <hr class="my-4"/>
+
+          <!-- Username -->
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="username" th:field="*{username}" placeholder="Choose a unique username"
+                   class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                   required minlength="3" maxlength="50" pattern="[a-zA-Z0-9_]+" title="Username can only contain letters, numbers, and underscores">
+            <div class="error-message" id="usernameError">Username must be 3-50 characters and contain only letters, numbers, and underscores</div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="••••••••"
+                   class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary"
+                   required minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                   title="Password must be at least 8 characters with uppercase, lowercase, and number">
+            <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase, lowercase, and number</div>
+          </div>
+
+          <!-- Submit Button -->
+          <div>
+            <button type="submit"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-300">
+              Register Account
+            </button>
+          </div>
+        </form>
+
+        <!-- Login Link -->
+        <div class="mt-8 text-center">
+          <p class="text-sm text-gray-600">
+            Already have an account?
+            <a href="/login" class="font-medium text-primary hover:text-secondary">
+              Sign In
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const inputs = form.querySelectorAll('input, select');
+
+    // Validation patterns and messages
+    const validations = {
+      fullName: {
+        validate: (value) => value.length >= 2 && value.length <= 100,
+        message: 'Full name must be 2-100 characters long'
+      },
+      dob: {
+        validate: (value) => {
+          if (!value) return false;
+          const dob = new Date(value);
+          const today = new Date();
+          return dob < today && dob > new Date('1900-01-01');
+        },
+        message: 'Please enter a valid date of birth'
+      },
+      gender: {
+        validate: (value) => value && value !== '',
+        message: 'Please select your gender'
+      },
+      contactNumber: {
+        validate: (value) => /^[0-9]{10}$/.test(value),
+        message: 'Please enter a valid 10-digit phone number'
+      },
+      email: {
+        validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+        message: 'Please enter a valid email address'
+      },
+      username: {
+        validate: (value) => /^[a-zA-Z0-9_]{3,50}$/.test(value),
+        message: 'Username must be 3-50 characters and contain only letters, numbers, and underscores'
+      },
+      password: {
+        validate: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value),
+        message: 'Password must be at least 8 characters with uppercase, lowercase, and number'
+      }
+    };
+
+    // Real-time validation
+    inputs.forEach(input => {
+      // Validate on input change
+      input.addEventListener('blur', function() {
+        validateField(this);
+      });
+
+      // Validate on input for immediate feedback
+      input.addEventListener('input', function() {
+        if (this.classList.contains('input-error')) {
+          validateField(this);
+        }
+      });
+
+      // Remove error styling when user starts typing
+      input.addEventListener('focus', function() {
+        this.classList.remove('input-error', 'input-success');
+        hideError(this.id + 'Error');
+      });
+    });
+
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      let isValid = true;
+      inputs.forEach(input => {
+        if (!validateField(input)) {
+          isValid = false;
+        }
+      });
+
+      if (isValid) {
+        form.submit();
+      } else {
+        // Focus on first invalid field
+        const firstInvalid = form.querySelector('.input-error');
+        if (firstInvalid) {
+          firstInvalid.focus();
+        }
+      }
+    });
+
+    function validateField(field) {
+      const fieldId = field.id;
+      const value = field.value.trim();
+      const errorElement = document.getElementById(fieldId + 'Error');
+
+      let isValid = true;
+      let errorMessage = '';
+
+      // Required field validation
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Pattern validation for specific fields
+      else if (value && validations[fieldId]) {
+        if (!validations[fieldId].validate(value)) {
+          isValid = false;
+          errorMessage = validations[fieldId].message;
+        }
+      }
+      // HTML5 validation constraints
+      else if (value && !field.checkValidity()) {
+        isValid = false;
+        errorMessage = field.validationMessage;
+      }
+
+      // Update UI
+      if (!isValid) {
+        field.classList.add('input-error');
+        field.classList.remove('input-success');
+        showError(errorElement, errorMessage);
+      } else {
+        field.classList.remove('input-error');
+        field.classList.add('input-success');
+        hideError(errorElement);
+      }
+
+      return isValid;
+    }
+
+    function showError(errorElement, message) {
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+    }
+
+    function hideError(errorElement) {
+      if (errorElement) {
+        errorElement.style.display = 'none';
+      }
+    }
+  });
+</script>
+</body>
+</html>

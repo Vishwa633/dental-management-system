@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Appointment Booking - SmileCare Clinic</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0ea5e9',
+                        secondary: '#06b6d4'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        .error-message {
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .success-check {
+            animation: checkmark 0.5s ease;
+        }
+        @keyframes checkmark {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="min-h-screen py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 flex items-center justify-center bg-primary text-white rounded-full mx-auto mb-4">
+                <i class="ri-tooth-line ri-2x"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Book Your Dental Appointment</h1>
+            <p class="text-gray-600">Schedule your visit with our experienced dental professionals</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <form id="appointmentForm" th:action="@{/appointments/book}" method="post" novalidate="">
+
+                <!-- Hidden inputs for form data -->
+
+                <div class="space-y-6">
+                    <div class="border-b border-gray-200 pb-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Patient Information</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label for="patientName" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="text" id="patientName" name="patientName" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="Enter your full name">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden" id="nameCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="nameError"></div>
+                            </div>
+
+                            <div>
+                                <label for="age" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Age <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="age" name="age" min="1" max="120" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="Enter your age">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden" id="ageCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="ageError"></div>
+                            </div>
+
+                            <div>
+                                <label for="genderSelect" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Gender <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select id="genderSelect" name="gender" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                        <i class="ri-arrow-down-s-line text-gray-400"></i>
+                                    </div>
+                                    <div class="absolute right-12 top-1/2 transform -translate-y-1/2 hidden" id="genderCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="genderError"></div>
+                            </div>
+
+                            <div>
+                                <label for="contactNumber" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Contact Number <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="tel" id="contactNumber" name="contactNumber" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="+1 (555) 123-4567">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden" id="phoneCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="phoneError"></div>
+                            </div>
+
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="email" id="email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="your.email@example.com">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden" id="emailCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="emailError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Appointment Details</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="dentistSelect" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Select Doctor <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select id="dentistSelect" name="dentistName" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
+                                        <option value="Dr. Nilusha Sudharaka (General Dentistry)">Dr. Nilusha Sudharaka (General Dentistry)</option>
+                                        <option value="Dr. Pankaja Yunidu (Orthodontics)">Dr. Pankaja Yunidu (Orthodontics)</option>
+                                        <option value="Dr. Thisuka Senan (Pediatric Dentistry)">Dr. Thisuka Senan (Pediatric Dentistry)</option>
+                                        <option value="Dr. Nadara Wanigasekara (Oral Surgery)">Dr. Nadara Wanigasekara (Oral Surgery)</option>
+                                        <option value="Dr. Amasha Sawandi (Periodontics)">Dr. Amasha Sawandi (Periodontics)</option>
+                                        <option value="Dr. Vishwa Nethsara (Cosmetic Dentistry)">Dr. Vishwa Nethsara (Cosmetic Dentistry)</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                        <i class="ri-arrow-down-s-line text-gray-400"></i>
+                                    </div>
+                                    <div class="absolute right-12 top-1/2 transform -translate-y-1/2 hidden" id="doctorCheck">
+                                        <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                            <i class="ri-check-line success-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message text-red-500 text-sm mt-1 hidden" id="doctorError"></div>
+                            </div>
+
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="preferredDate" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Preferred Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="date" id="preferredDate" name="preferredDate" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden" id="dateCheck">
+                                            <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                                <i class="ri-check-line success-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="dateError"></div>
+                                    <div class="text-xs text-gray-500 mt-1">Minimum 1 day advance booking required</div>
+                                </div>
+
+                                <div>
+                                    <label for="timeSelect" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Preferred Time <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <select id="timeSelect" name="preferredTime" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
+                                            <option value="09:00 AM">9:00 AM</option>
+                                            <option value="09:30 AM">9:30 AM</option>
+                                            <option value="10:00 AM" selected>10:00 AM</option>
+                                            <option value="10:30 AM">10:30 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="11:30 AM">11:30 AM</option>
+                                            <option value="02:00 PM">2:00 PM</option>
+                                            <option value="02:30 PM">2:30 PM</option>
+                                            <option value="03:00 PM">3:00 PM</option>
+                                            <option value="03:30 PM">3:30 PM</option>
+                                            <option value="04:00 PM">4:00 PM</option>
+                                            <option value="04:30 PM">4:30 PM</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                            <i class="ri-arrow-down-s-line text-gray-400"></i>
+                                        </div>
+                                        <div class="absolute right-12 top-1/2 transform -translate-y-1/2 hidden" id="timeCheck">
+                                            <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                                                <i class="ri-check-line success-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="timeError"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="appointmentNotes" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Appointment Notes <span class="text-gray-400">(Optional)</span>
+                                </label>
+                                <textarea id="appointmentNotes" name="appointmentNotes" rows="4" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none" placeholder="Please describe your symptoms or reason for visit..."></textarea>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <span id="noteCount">0</span>/500 characters
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-5 h-5 flex items-center justify-center text-blue-600 mt-0.5">
+                                <i class="ri-information-line"></i>
+                            </div>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium mb-1">Important Information:</p>
+                                <ul class="space-y-1 text-blue-700">
+                                    <li>• Appointments must be booked at least 1 day in advance</li>
+                                    <li>• Maximum 30 appointments per day (some dates may be unavailable)</li>
+                                    <li>• Please arrive 15 minutes early for your appointment</li>
+                                    <li>• Bring a valid ID and insurance information</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" id="submitBtn" class="!rounded-button whitespace-nowrap w-full bg-primary text-white py-4 px-6 font-semibold hover:bg-blue-600 transition-colors cursor-pointer">
+                            <span id="submitText">Book Appointment</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('appointmentForm');
+
+        // Form validation fields
+        const fields = {
+            patientName: {
+                element: document.getElementById('patientName'),
+                check: document.getElementById('nameCheck'),
+                error: document.getElementById('nameError'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Full name is required';
+                    if (value.trim().length < 2) return 'Name must be at least 2 characters';
+                    if (!/^[a-zA-Z\s]+$/.test(value)) return 'Name can only contain letters and spaces';
+                    return null;
+                }
+            },
+            age: {
+                element: document.getElementById('age'),
+                check: document.getElementById('ageCheck'),
+                error: document.getElementById('ageError'),
+                validate: (value) => {
+                    if (!value) return 'Age is required';
+                    if (value < 1 || value > 120) return 'Please enter a valid age between 1 and 120';
+                    return null;
+                }
+            },
+            contactNumber: {
+                element: document.getElementById('contactNumber'),
+                check: document.getElementById('phoneCheck'),
+                error: document.getElementById('phoneError'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Contact number is required';
+                    // Use a simpler regex that won't conflict with Thymeleaf
+                    const phoneRegex = /^[+]?[0-9]{10,15}$/;
+                    if (!phoneRegex.test(value.replace(/[-\s()]/g, ''))) return 'Please enter a valid phone number';
+                    return null;
+                }
+            },
+            email: {
+                element: document.getElementById('email'),
+                check: document.getElementById('emailCheck'),
+                error: document.getElementById('emailError'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Email address is required';
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) return 'Please enter a valid email address';
+                    return null;
+                }
+            },
+            preferredDate: {
+                element: document.getElementById('preferredDate'),
+                check: document.getElementById('dateCheck'),
+                error: document.getElementById('dateError'),
+                validate: (value) => {
+                    if (!value) return 'Preferred date is required';
+                    const selectedDate = new Date(value);
+                    const tomorrow = new Date();
+                    tomorrow.setHours(0,0,0,0);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    if (selectedDate < tomorrow) return 'Appointment must be at least 1 day in advance';
+                    return null;
+                }
+            },
+            dentistName: {
+                element: document.getElementById('dentistSelect'),
+                check: document.getElementById('doctorCheck'),
+                error: document.getElementById('doctorError'),
+                validate: (value) => {
+                    if (!value) return 'Please select a doctor';
+                    return null;
+                }
+            },
+            preferredTime: {
+                element: document.getElementById('timeSelect'),
+                check: document.getElementById('timeCheck'),
+                error: document.getElementById('timeError'),
+                validate: (value) => {
+                    if (!value) return 'Please select a preferred time';
+                    return null;
+                }
+            },
+            gender: {
+                element: document.getElementById('genderSelect'),
+                check: document.getElementById('genderCheck'),
+                error: document.getElementById('genderError'),
+                validate: (value) => {
+                    if (!value) return 'Please select your gender';
+                    return null;
+                }
+            }
+        };
+
+        // Add real-time validation for all fields
+        Object.keys(fields).forEach(fieldName => {
+            const field = fields[fieldName];
+            if (field.element) {
+                field.element.addEventListener('change', () => validateField(fieldName));
+                field.element.addEventListener('blur', () => validateField(fieldName));
+
+                // For text inputs, also validate on input
+                if (field.element.type === 'text' || field.element.type === 'email' || field.element.type === 'tel' || field.element.type === 'number') {
+                    field.element.addEventListener('input', () => validateField(fieldName));
+                }
+            }
+        });
+
+        // Notes character counter
+        const notesTextarea = document.getElementById('appointmentNotes');
+        const noteCount = document.getElementById('noteCount');
+        if (notesTextarea && noteCount) {
+            notesTextarea.addEventListener('input', function() {
+                noteCount.textContent = this.value.length;
+            });
+        }
+
+        // Set minimum date to tomorrow
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateInput = document.getElementById('preferredDate');
+        if (dateInput) {
+            dateInput.min = tomorrow.toISOString().split('T')[0];
+        }
+
+        function validateField(fieldName) {
+            const field = fields[fieldName];
+            if (!field.element) return false;
+
+            const value = field.element.value;
+            const error = field.validate(value);
+
+            if (error) {
+                field.error.textContent = error;
+                field.error.classList.remove('hidden');
+                if (field.check) field.check.classList.add('hidden');
+                return false;
+            } else {
+                field.error.classList.add('hidden');
+                if (field.check) field.check.classList.remove('hidden');
+                return true;
+            }
+        }
+
+        // Form submission validation
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Validate all fields
+                Object.keys(fields).forEach(fieldName => {
+                    if (!validateField(fieldName)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    const firstError = document.querySelector('.error-message:not(.hidden)');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

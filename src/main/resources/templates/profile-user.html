@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Smilecare Dental</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add this new style for the notes row */
+        .notes-row td {
+            background-color: #f8f9fa;
+            padding-top: 10px;
+            padding-bottom: 15px;
+            font-size: 0.85rem;
+            color: #555;
+            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        }
+        .notes-label {
+            font-weight: 600;
+            color: #333;
+        }
+        /* Add this CSS for the new logout button */
+        .logout-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b; /* A darker red */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c7fb8;
+            --primary-light: #5fa8d3;
+            --secondary: #f8f9fa;
+            --accent: #ff9f1c;
+            --text: #333;
+            --text-light: #6c757d;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title i {
+            font-size: 2rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .notification-icon:hover {
+            background: var(--primary-light);
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .profile-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .profile-img-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--primary-light);
+            transition: all 0.3s;
+        }
+
+        .profile-img:hover {
+            opacity: 0.8;
+        }
+
+        .edit-img-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .edit-img-btn:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .username {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .profile-details {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-label {
+            width: 120px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .detail-value {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .update-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .update-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointments-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+
+        .section-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Modern borderless table design */
+        .appointments-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .appointments-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .appointments-table th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .appointments-table th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        .appointments-table td {
+            padding: 18px 15px;
+            vertical-align: middle;
+        }
+
+        .appointments-table tr:not(:last-child) td {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .appointments-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .appointments-table tr:hover {
+            background-color: rgba(47, 127, 184, 0.05);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .approved-text {
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #c0392b;
+        }
+
+        .no-actions {
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* Notification Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: calc(80vh - 80px);
+            overflow-y: auto;
+        }
+
+        /* Beautiful Notification Table with Borders */
+        .notifications-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .notifications-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #e1e5e9;
+        }
+
+        .notifications-table th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .notifications-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e1e5e9;
+            vertical-align: top;
+        }
+
+        .notifications-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .notifications-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .notifications-table tr:hover {
+            background-color: rgba(47, 127, 184, 0.08);
+        }
+
+        .notification-message {
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        .notification-new {
+            position: relative;
+        }
+
+        .notification-new::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: var(--primary);
+        }
+
+        .notification-date, .notification-time {
+            white-space: nowrap;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .notification-date {
+            color: var(--primary);
+        }
+
+        .notification-time {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .empty-notifications {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .empty-notifications i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        @media (max-width: 992px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+
+            .appointments-table,
+            .notifications-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-img-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .appointments-table th,
+            .appointments-table td,
+            .notifications-table th,
+            .notifications-table td {
+                padding: 12px 10px;
+            }
+
+            .modal {
+                width: 95%;
+            }
+
+            .notifications-table {
+                font-size: 0.9rem;
+            }
+        }
+        /* --- ADD THIS ENTIRE BLOCK FOR DARK MODE --- */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        body.dark-mode .profile-card,
+        body.dark-mode .appointments-section,
+        body.dark-mode .modal,
+        body.dark-mode .notifications-container {
+            background: #2b2b2b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: #444;
+        }
+        body.dark-mode .page-title,
+        body.dark-mode .section-title,
+        body.dark-mode .username,
+        body.dark-mode .notes-label,
+        body.dark-mode .notification-date,
+        body.dark-mode #darkModeToggle { /* Make toggle icon dark-mode aware */
+            color: var(--primary-light);
+        }
+        body.dark-mode .user-role,
+        body.dark-mode .detail-label,
+        body.dark-mode .no-actions,
+        body.dark-mode .notification-time {
+            color: #adb5bd;
+        }
+        body.dark-mode .detail-value,
+        body.dark-mode .notification-message {
+            color: #e0e0e0;
+        }
+        body.dark-mode .detail-item,
+        body.dark-mode .section-header {
+            border-bottom-color: #444;
+        }
+        body.dark-mode .appointments-table tr:nth-child(even),
+        body.dark-mode .notifications-table tr:nth-child(even) {
+            background-color: #333;
+        }
+        body.dark-mode .appointments-table tr:hover,
+        body.dark-mode .notifications-table tr:hover {
+            background-color: rgba(47, 127, 184, 0.15);
+        }
+        body.dark-mode .appointments-table tr:not(:last-child) td,
+        body.dark-mode .notifications-table td {
+            border-bottom-color: #444;
+
+        }
+        body.dark-mode .notifications-table {
+            border-color: #444;
+        }
+        body.dark-mode .notes-row td {
+            background-color: #303030;
+            color: #ccc;
+            border-bottom-color: #444 !important;
+        }
+        body.dark-mode .empty-notifications i {
+            color: #444;
+        }
+        /* --- END OF DARK MODE BLOCK --- */
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-user-circle"></i> My Profile
+        </h1>
+
+        <div class="header-actions" style="display: flex; align-items: center; gap: 20px;">
+            <div class="notification-icon" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge"
+                     th:text="${#lists.size(userAlerts)}"
+                     th:if="${not #lists.isEmpty(userAlerts)}">
+                    0
+                </div>
+            </div>
+            <button id="darkModeToggle" title="Toggle Dark Mode" style="background: none; border: none; color: var(--primary); font-size: 1.5rem; cursor: pointer; padding: 10px;">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-img-container" id="imageContainer">
+                <img th:src="@{/image/profile_icon.png}" alt="Profile Image" class="profile-img" id="profileImage">
+                <button class="edit-img-btn" id="editImageBtn">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+            </div>
+            <h2 class="username" th:text="${user.username}">@john_doe</h2>
+            <p class="user-role">Premium Member</p>
+
+            <div class="profile-details">
+                <div class="detail-item">
+                    <div class="detail-label">Full Name:</div>
+                    <div class="detail-value" th:text="${user.fullName}">John Michael Doe</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Date of Birth:</div>
+                    <div class="detail-value" th:text="${user.dob}">June 15, 1985 (38 years)</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Gender:</div>
+                    <div class="detail-value" th:text="${user.gender}">Male</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value" th:text="${user.email}">john.doe@example.com</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Phone:</div>
+                    <div class="detail-value" th:text="${user.contactNumber}">+1 (555) 123-4567</div>
+                </div>
+            </div>
+
+            <!-- Replace the existing update button in profile.html -->
+            <a th:href="@{/users/edit/{id}(id=${user.id})}">
+                <button class="update-btn">
+                    <i class="fas fa-edit"></i> Update Profile
+                </button>
+            </a>
+        </div>
+
+        <div class="appointments-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i> Appointment History
+                </h2>
+            </div>
+            <!Ap history cancel error-->
+            <div>
+                <div th:if="${success}" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin-bottom: 20px;" th:text="${success}"></div>
+                <div th:if="${error}" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-bottom: 20px;" th:text="${error}"></div>
+                <table class="appointments-table">
+                </table>
+            </div>
+            <table class="appointments-table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Dentist</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="appointment : ${appointments}">
+                    <tr>
+                        <td th:text="${#temporals.format(appointment.appointmentDate, 'MMM dd, yyyy')}"></td>
+                        <td th:text="${appointment.preferredTime}"></td>
+                        <td th:text="${appointment.patientName}"></td>
+                        <td th:text="${appointment.dentistName}"></td>
+                        <td>
+                <span th:switch="${appointment.status}" class="status">
+                    <span th:case="'PENDING'" class="status-pending" th:text="${appointment.status}"></span>
+                    <span th:case="'ACCEPTED'" class="status-approved" th:text="${appointment.status}"></span>
+                    <span th:case="'COMPLETED'" class="status-completed" th:text="${appointment.status}"></span>
+                    <span th:case="'REJECTED'" class="status-cancelled" th:text="${appointment.status}"></span>
+                </span>
+                        </td>
+                        <td>
+                            <form th:if="${appointment.status == 'PENDING'}" th:action="@{/appointments/cancel/{id}(id=${appointment.id})}" method="post">
+                                <button type="submit" class="btn btn-cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">Cancel</button>
+                            </form>
+                            <span th:if="${appointment.status != 'PENDING'}" class="no-actions">No actions available</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${appointment.appointmentNotes != null and !appointment.appointmentNotes.isEmpty()}" class="notes-row">
+                        <td colspan="6">
+                            <span class="notes-label">Notes:</span>
+                            <span th:text="${appointment.appointmentNotes}"></span>
+                        </td>
+                    </tr>
+                </th:block>
+
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                    <td colspan="6" class="no-actions" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 15px; color: #e0e0e0;"></i>
+                        <p>No appointments found.</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal -->
+<!-- Updated Notification Modal -->
+<!-- Notification Modal -->
+<!-- Updated Notification Modal -->
+<div class="modal-overlay" id="notificationModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <i class="fas fa-bell"></i> Notifications
+            </h2>
+            <button class="close-btn" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="notifications-container">
+                <table class="notifications-table">
+                    <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Dentist</th>  <!-- ADD THIS COLUMN -->
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- REAL ALERTS FROM DATABASE -->
+                    <tr th:each="alert : ${userAlerts}">
+                        <td class="notification-message" th:text="${alert.message}"></td>
+                        <td class="notification-dentist" th:text="${alert.dentistName}"></td>  <!-- ADD THIS DATA -->
+                        <td class="notification-date"
+                            th:text="${#temporals.format(alert.sentDate, 'MMM dd, yyyy')}"></td>
+                        <td class="notification-time"
+                            th:text="${#temporals.format(alert.sentDate, 'hh:mm a')}"></td>
+                    </tr>
+
+                    <!-- EMPTY STATE -->
+                    <tr th:if="${#lists.isEmpty(userAlerts)}">
+                        <td colspan="4" class="empty-notifications">  <!-- UPDATE COLSPAN TO 4 -->
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications</h3>
+                            <p>You don't have any notifications yet.</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Image upload functionality
+    const fileInput = document.getElementById('fileInput');
+    const profileImage = document.getElementById('profileImage');
+    const editImageBtn = document.getElementById('editImageBtn');
+    const imageContainer = document.getElementById('imageContainer');
+
+    // Open file dialog when clicking on the image or editService button
+    imageContainer.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                profileImage.src = e.target.result;
+                // In a real application, you would send this to the server
+                alert('Profile picture updated successfully!');
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Appointment cancellation functionality
+    //  function cancelAppointment(appointmentId) {
+    // if(confirm('Are you sure you want to cancel this appointment?')) {
+    //     // In a real app, this would make an API call
+    //     fetch('/appointments/cancel/' + appointmentId, {
+    ///     method: 'POST',
+    //    headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // })
+    //       .then(response => {
+    //             if (response.ok) {
+    //                   alert('Your appointment has been cancelled.');
+    //                     location.reload();
+    //                 } else {
+    //                     alert('Error cancelling appointment.');
+    //                }
+    //            })
+    //             .catch(error => {
+    //                 alert('Error cancelling appointment: ' + error.message);
+    //              });
+    //       }
+    //   }
+
+    // Profile update functionality
+    document.querySelector('.update-btn').addEventListener('click', function() {
+        // This will navigate to the edit profile page via the link
+    });
+
+    // Notification modal functionality
+    const notificationIcon = document.getElementById('notificationIcon');
+    const notificationModal = document.getElementById('notificationModal');
+    const closeModal = document.getElementById('closeModal');
+
+    // Open notification modal
+    // Notification modal functionality - UPDATED
+    // Fixed notification click handler
+    notificationIcon.addEventListener('click', function() {
+        notificationModal.classList.add('active');
+
+        // Safe badge update
+        const notificationBadge = document.querySelector('.notification-badge');
+        if (notificationBadge && notificationBadge.textContent) {
+            const alertCount = parseInt(notificationBadge.textContent);
+            if (alertCount > 0) {
+                notificationBadge.textContent = '0';
+                notificationBadge.style.display = 'none';
+            }
+        }
+    });
+
+
+    // Close notification modal
+    closeModal.addEventListener('click', function() {
+        notificationModal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    notificationModal.addEventListener('click', function(e) {
+        if (e.target === notificationModal) {
+            notificationModal.classList.remove('active');
+        }
+    });
+    // --- UPDATED DARK MODE SCRIPT (WITH LOCALSTORAGE) ---
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const toggleIcon = darkModeToggle.querySelector('i');
+
+    // Function to apply the correct theme
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            toggleIcon.classList.remove('fa-moon');
+            toggleIcon.classList.add('fa-sun');
+        } else {
+            body.classList.remove('dark-mode');
+            toggleIcon.classList.remove('fa-sun');
+            toggleIcon.classList.add('fa-moon');
+        }
+    };
+
+    // Check localStorage when the page loads
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        applyTheme(currentTheme);
+    } else {
+        applyTheme('light'); // Default to light mode
+    }
+
+    // Toggle event listener
+    darkModeToggle.addEventListener('click', function() {
+        let newTheme;
+        if (body.classList.contains('dark-mode')) {
+            newTheme = 'light';
+        } else {
+            newTheme = 'dark';
+        }
+
+        // Apply the new theme
+        applyTheme(newTheme);
+
+        // Save the choice to localStorage
+        localStorage.setItem('theme', newTheme);
+    });
+    // --- END OF DARK MODE SCRIPT ---
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>

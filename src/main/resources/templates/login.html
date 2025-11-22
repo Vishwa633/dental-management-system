@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - SmileCare Dental</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Pacifico', 'cursive'] },
+          colors: { primary: '#3b82f6', secondary: '#1e40af', light: '#f0f9ff' }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-light">
+
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+
+    <div class="w-full md:w-1/2 relative">
+      <img th:src="@{/image/smile.jpg}"
+           alt="A welcoming dental clinic environment"
+           class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-primary bg-opacity-20"></div>
+    </div>
+
+    <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+      <div class="text-center mb-8">
+        <h1 class="font-display text-4xl text-primary mb-2">SmileCare</h1>
+        <h2 class="text-2xl font-bold text-gray-800">Welcome Back!</h2>
+        <p class="text-gray-600">Please sign in to continue.</p>
+      </div>
+
+      <form th:action="@{/login}" method="post" class="space-y-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+          <input type="text" id="username" name="username" class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary" required="required"/>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password" class="mt-1 w-full border border-gray-300 rounded-lg shadow-sm py-2 px-4 focus:outline-none focus:ring-primary focus:border-primary" required="required"/>
+        </div>
+        <div>
+          <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+            Sign In
+          </button>
+        </div>
+      </form>
+
+      <div th:if="${param.error}" class="mt-4 p-3 bg-red-100 border-red-200 text-red-800 rounded-lg text-center text-sm">
+        Invalid username or password.
+      </div>
+      <div th:if="${success}" class="mt-4 p-3 bg-green-100 border-green-200 text-green-800 rounded-lg text-center text-sm" th:text="${success}">
+      </div>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a th:href="@{/register}" class="font-medium text-primary hover:text-secondary">Register Now</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

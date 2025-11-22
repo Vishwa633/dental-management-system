@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmileCare - Professional Dental Clinic</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- Remix Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0ea5e9',
+            secondary: '#06b6d4'
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
+          },
+          fontFamily: {
+            'pacifico': ['Pacifico', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .smooth-transition {
+      transition: all 0.3s ease;
+    }
+    .hero-bg {
+      background-image: url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .hero-overlay {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 50%, rgba(14,165,233,0.1) 100%);
+    }
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="bg-white">
+<!-- Header Navigation -->
+<nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <span class="font-pacifico text-2xl text-primary">SmileCare</span>
+      </div>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="#home" class="text-gray-700 hover:text-primary smooth-transition">Home</a>
+        <a href="#services" class="text-gray-700 hover:text-primary smooth-transition">Services</a>
+        <a href="#doctors" class="text-gray-700 hover:text-primary smooth-transition">Doctors</a>
+        <a href="#contact" class="text-gray-700 hover:text-primary smooth-transition">Contact</a>
+      </div>
+      <div class="flex items-center space-x-4">
+
+        <div sec:authorize="isAnonymous()">
+          <a th:href="@{/login.html}" class="text-gray-700 hover:text-primary smooth-transition whitespace-nowrap rounded-button">
+            Login
+          </a>
+        </div>
+
+        <div sec:authorize="isAuthenticated() and hasRole('PATIENT')" class="flex items-center space-x-3">
+    <span class="text-gray-700">
+        Hi, <span sec:authentication="name" class="font-medium">Username</span>
+    </span>
+          <a th:href="@{/users/profile}" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-600 smooth-transition">
+            <i class="ri-user-line"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero-bg min-h-screen flex items-center pt-16"> <div th:if="${success}" class="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-md z-20">
+  <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg shadow-lg text-center" role="alert">
+    <strong class="font-bold">Success!</strong>
+    <span class="block sm:inline" th:text="${success}"></span>
+  </div>
+</div>
+  <div class="hero-overlay absolute inset-0"></div>
+  <div class="relative z-10 w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl fade-in">
+        <h1 class="text-5xl font-bold text-gray-900 mb-6">Your Smile is Our Priority</h1>
+        <p class="text-xl text-gray-700 mb-8">Experience exceptional dental care with our team of expert dentists. We provide comprehensive dental services in a comfortable, modern environment.</p>
+        <div class="flex space-x-4">
+          <a th:href="@{/appointments/book}" class="bg-primary text-white px-8 py-3 text-lg hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">Book Appointment</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Dental Services</h2>
+      <p class="text-xl text-gray-600">Comprehensive dental care for all your oral health needs</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Service cards remain the same but with corrected classes -->
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-shield-check-line text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Preventive Care</h3>
+        <p class="text-gray-600 mb-4">Regular cleanings, check-ups, and preventive treatments to maintain optimal oral health.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Dental Cleanings</li>
+          <li>• Oral Examinations</li>
+          <li>• Fluoride Treatments</li>
+        </ul>
+      </div>
+
+      <!-- Other service cards follow same pattern -->
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-star-line text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Cosmetic Dentistry</h3>
+        <p class="text-gray-600 mb-4">Enhance your smile with our advanced cosmetic dental procedures.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Teeth Whitening</li>
+          <li>• Porcelain Veneers</li>
+          <li>• Smile Makeovers</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-tools-line text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Restorative Services</h3>
+        <p class="text-gray-600 mb-4">Restore damaged teeth with our comprehensive restorative treatments.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Dental Fillings</li>
+          <li>• Crowns & Bridges</li>
+          <li>• Dental Implants</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-align-center text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Orthodontics</h3>
+        <p class="text-gray-600 mb-4">Straighten your teeth with modern orthodontic solutions.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Traditional Braces</li>
+          <li>• Clear Aligners</li>
+          <li>• Retainers</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-surgical-mask-line text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Oral Surgery</h3>
+        <p class="text-gray-600 mb-4">Advanced surgical procedures performed with precision and care.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Tooth Extractions</li>
+          <li>• Wisdom Teeth Removal</li>
+          <li>• Gum Surgery</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-8 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mb-6 rounded-lg">
+          <i class="ri-heart-pulse-line text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Emergency Care</h3>
+        <p class="text-gray-600 mb-4">Immediate dental care for urgent situations and dental emergencies.</p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• Emergency Appointments</li>
+          <li>• Pain Relief</li>
+          <li>• Urgent Repairs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dental Disorders Section -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Common Dental Disorders</h2>
+      <p class="text-xl text-gray-600">Understanding and treating various dental conditions</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Disorder cards with placeholder images -->
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <img src="/image/Dis1.jpg" alt="Tooth Decay" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Tooth Decay & Cavities</h3>
+        <p class="text-gray-600 mb-4">Dental caries or tooth decay occurs when bacteria form a film (plaque) on teeth and produce acid that erodes tooth enamel. Early signs include dark spots and sensitivity.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Regular brushing & flossing</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Fluoride treatments</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Dental sealants</li>
+        </ul>
+      </div>
+
+      <!-- Other disorder cards follow same pattern -->
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <img src="/image/dis2.jpg" alt="Gum Disease" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Periodontal Disease</h3>
+        <p class="text-gray-600 mb-4">Gum disease begins with gingivitis and can progress to periodontitis. Symptoms include bleeding gums, recession, and loose teeth if left untreated.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Professional cleaning</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Scaling & root planing</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Antibiotic treatment</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <img src="/image/dis3.jpg" alt="Tooth Sensitivity" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Tooth Sensitivity</h3>
+        <p class="text-gray-600 mb-4">Sensitivity occurs when tooth enamel wears down or gums recede, exposing dentin. Common triggers include hot, cold, sweet, and acidic substances.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Desensitizing toothpaste</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Fluoride treatments</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Bonding procedures</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <img src="/image/dis4.jpg" alt="Malocclusion" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Malocclusion</h3>
+        <p class="text-gray-600 mb-4">Misaligned teeth or incorrect bite relationships can cause difficulty in chewing, speaking, and maintaining oral hygiene. May lead to TMJ disorders.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Orthodontic braces</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Clear aligners</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Dental surgery</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <img src="/image/dis5.jpg" alt="Dental Abscess" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Dental Abscess</h3>
+        <p class="text-gray-600 mb-4">A severe infection that creates a pocket of pus in tooth or gum tissue. Causes severe pain, swelling, and fever. Requires immediate treatment.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Root canal therapy</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Antibiotics</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Drainage procedure</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <img src="/image/dis6.jpg" alt="Dental Trauma" class="w-full h-48 object-cover mb-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Dental Trauma</h3>
+        <p class="text-gray-600 mb-4">Injuries to teeth and surrounding tissues from accidents or impacts. Can include chips, cracks, displacement, or complete tooth loss.</p>
+        <ul class="text-sm text-gray-500 space-y-2">
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Emergency care</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Dental bonding</li>
+          <li class="flex items-center"><i class="ri-checkbox-circle-line text-primary mr-2"></i>Crown placement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Doctors Section -->
+<section id="doctors" class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Meet Our Expert Dentists</h2>
+      <p class="text-xl text-gray-600">Experienced professionals dedicated to your oral health</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Doctor cards with placeholder images -->
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/nilusha%2011.jpg" alt="Dr. Nilusha Sudharaka" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Nilusha Sudharaka</h3>
+        <p class="text-primary font-medium mb-2">General Dentistry</p>
+        <p class="text-sm text-gray-600 mb-4">Metropolitan Dental Center</p>
+        <p class="text-sm text-gray-500 mb-4">15 years of experience in comprehensive dental care with a focus on patient comfort and preventive treatments.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 01</button>
+      </div>
+
+      <!-- Other doctor cards follow same pattern -->
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/panke.jpg" alt="Dr. Pankaja Yunidu" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Pankaja Yunidu</h3>
+        <p class="text-primary font-medium mb-2">Orthodontics</p>
+        <p class="text-sm text-gray-600 mb-4">Smile Specialists Clinic</p>
+        <p class="text-sm text-gray-500 mb-4">Specializing in braces and clear aligners with over 12 years of experience in creating beautiful smiles.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 02</button>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/nadara.jpg" alt="Dr. Nadara Wanigasekara" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Nadara Wanigasekara</h3>
+        <p class="text-primary font-medium mb-2">Oral Surgery</p>
+        <p class="text-sm text-gray-600 mb-4">Advanced Dental Surgery Center</p>
+        <p class="text-sm text-gray-500 mb-4">Expert in complex oral surgeries and dental implants with 18 years of surgical experience.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 03</button>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-1 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/vishwa%202.jpg" alt="Dr. Vishwa Nethsara" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Vishwa Nethsara</h3>
+        <p class="text-primary font-medium mb-2">Cosmetic Dentistry</p>
+        <p class="text-sm text-gray-600 mb-4">Aesthetic Smile Studio</p>
+        <p class="text-sm text-gray-500 mb-4">Renowned for smile makeovers and aesthetic dental procedures with 14 years of cosmetic expertise.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 04</button>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-2 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/Senan.jpg" alt="Dr. Thisuka Senan" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Thisuka Senan</h3>
+        <p class="text-primary font-medium mb-2">Pediatric Dentistry</p>
+        <p class="text-sm text-gray-600 mb-4">Kids Dental Care Center</p>
+        <p class="text-sm text-gray-500 mb-4">Specializing in children's dental health with 10 years of experience in pediatric care.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 05</button>
+      </div>
+
+      <div class="bg-white p-6 shadow-lg card-hover fade-in stagger-3 rounded-lg">
+        <div class="relative mb-6">
+          <img src="/image/Amasha.jpg" alt="Dr. Amasha Sawandi" class="w-full h-64 object-cover object-top rounded-lg">
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Dr. Amasha Sawandi</h3>
+        <p class="text-primary font-medium mb-2">Periodontics</p>
+        <p class="text-sm text-gray-600 mb-4">Gum Health Specialists</p>
+        <p class="text-sm text-gray-500 mb-4">Expert in gum disease treatment and prevention with 16 years of periodontal experience.</p>
+        <button class="w-full bg-primary text-white py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">DOCTOR ID- 06</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Contact Us</h2>
+      <p class="text-xl text-gray-600">Get in touch with our friendly team</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div class="fade-in stagger-1">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h3>
+        <form class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+              <input type="text" class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+              <input type="text" class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+            <input type="tel" class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+            <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-primary text-white py-3 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">Send Message</button>
+        </form>
+      </div>
+      <div class="fade-in stagger-2">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Visit Our Clinic</h3>
+        <div class="space-y-6">
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 bg-primary/10 flex items-center justify-center rounded-lg">
+              <i class="ri-map-pin-line text-primary"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Address</h4>
+              <p class="text-gray-600">N0 : 123 Kandy Road<br> Malabe , Colombo District</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 bg-primary/10 flex items-center justify-center rounded-lg">
+              <i class="ri-phone-line text-primary"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Phone</h4>
+              <p class="text-gray-600"> 011 225 6700</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 bg-primary/10 flex items-center justify-center rounded-lg">
+              <i class="ri-mail-line text-primary"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Email</h4>
+              <p class="text-gray-600">info@smilecare.com</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 bg-primary/10 flex items-center justify-center rounded-lg">
+              <i class="ri-time-line text-primary"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Office Hours</h4>
+              <div class="text-gray-600 space-y-1">
+                <p>Monday - Friday: 10:00 AM - 8:00 PM</p>
+                <p>Saturday: 9:00 AM - 4:00 PM</p>
+                <p>Sunday: Closed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 h-64 bg-gray-200 rounded-lg overflow-hidden">
+          <div class="w-full h-full" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?center=Malabe,Colombo,Sri+Lanka&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyC4R6AN7SmujjjPUIGKdyao2Kqitzr1zlR'); background-size: cover; background-position: center;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div>
+        <span class="font-pacifico text-2xl text-primary">SmileCare</span>
+        <p class="text-gray-400 mt-4">Providing exceptional dental care with a focus on patient comfort and advanced treatment options.</p>
+        <div class="flex space-x-4 mt-6">
+          <div class="w-8 h-8 bg-gray-800 hover:bg-primary flex items-center justify-center rounded-lg smooth-transition cursor-pointer">
+            <i class="ri-facebook-fill"></i>
+          </div>
+          <div class="w-8 h-8 bg-gray-800 hover:bg-primary flex items-center justify-center rounded-lg smooth-transition cursor-pointer">
+            <i class="ri-twitter-fill"></i>
+          </div>
+          <div class="w-8 h-8 bg-gray-800 hover:bg-primary flex items-center justify-center rounded-lg smooth-transition cursor-pointer">
+            <i class="ri-instagram-fill"></i>
+          </div>
+          <div class="w-8 h-8 bg-gray-800 hover:bg-primary flex items-center justify-center rounded-lg smooth-transition cursor-pointer">
+            <i class="ri-linkedin-fill"></i>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#home" class="hover:text-white smooth-transition">Home</a></li>
+          <li><a href="#services" class="hover:text-white smooth-transition">Services</a></li>
+          <li><a href="#doctors" class="hover:text-white smooth-transition">Doctors</a></li>
+          <li><a href="#contact" class="hover:text-white smooth-transition">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Services</h3>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#services" class="hover:text-white smooth-transition">General Dentistry</a></li>
+          <li><a href="#services" class="hover:text-white smooth-transition">Cosmetic Dentistry</a></li>
+          <li><a href="#services" class="hover:text-white smooth-transition">Orthodontics</a></li>
+          <li><a href="#services" class="hover:text-white smooth-transition">Oral Surgery</a></li>
+          <li><a href="#services" class="hover:text-white smooth-transition">Emergency Care</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+        <p class="text-gray-400 mb-4">Subscribe to get updates on dental health tips and special offers.</p>
+        <div class="flex space-x-2">
+          <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent text-sm rounded-lg">
+          <button class="bg-primary text-white px-4 py-2 hover:bg-blue-600 smooth-transition whitespace-nowrap rounded-button">Subscribe</button>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400">© 2025 Smile Care. All rights reserved.</p>
+      <div class="flex space-x-6 mt-4 md:mt-0">
+        <a href="#" class="text-gray-400 hover:text-white smooth-transition">Privacy Policy</a>
+        <a href="#" class="text-gray-400 hover:text-white smooth-transition">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Smooth scrolling
+  document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
+          const offsetTop = targetSection.offsetTop - 80;
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  });
+
+  // Animation observer
+  document.addEventListener('DOMContentLoaded', function() {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, observerOptions);
+
+    const animatedElements = document.querySelectorAll('.fade-in');
+    animatedElements.forEach(el => {
+      observer.observe(el);
+    });
+  });
+</script>
+</body>
+</html>
