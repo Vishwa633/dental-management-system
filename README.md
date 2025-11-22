@@ -5,7 +5,7 @@ A modern and user-friendly Dental Clinic Management System designed to simplify 
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" />
   <img src="https://img.shields.io/badge/Java-Spring%20Boot-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/Frontend-HTML%2FCSS-orange?style=flat-square" />
-  <img src="https://img.shields.io/badge/Build-Gradle-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/Build-Maven-green?style=flat-square" />
 </p>
 
 ---
