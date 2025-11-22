@@ -48,7 +48,3 @@ It provides a clean interface for receptionists, doctors, admin users, x-ray ass
 | **Database** | SQL Server Management System |
 | **Version Control** | Git & GitHub |
 
----
-
-## 📦 Folder Structure
-
